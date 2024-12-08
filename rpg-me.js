@@ -1,175 +1,231 @@
-// /**
-//  * Copyright 2024 tay3434
-//  * @license Apache-2.0, see LICENSE for full text.
-//  */
 import { LitElement, html, css } from "lit";
 import { DDDSuper } from "@haxtheweb/d-d-d/d-d-d.js";
 import { I18NMixin } from "@haxtheweb/i18n-manager/lib/I18NMixin.js";
-import { WiredButton, WiredInput } from "wired-elements";
-import '@haxtheweb/rpg-character/rpg-character.js';
+import { WiredButton, WiredCombo, WiredItem, WiredCheckbox } from "wired-elements";
+import "@haxtheweb/rpg-character/rpg-character.js";
+// import "wired-elements";
 
 export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
-
   static get tag() {
     return "rpg-me";
   }
 
   constructor() {
     super();
-    this.title = "";
-    this.seed = "0000000000"; 
-    this.t = this.t || {};
-    this.t = {
-      ...this.t,
-      title: "Title",
-    };
-    this.registerLocalization({
-            context: this,
-            localesPath:
-              new URL("./locales/rpg-character.ar.json", import.meta.url).href +
-              "/../",
-            locales: ["ar", "es", "hi", "zh"],
-          });
+    this.seed = "0000000000";
+    this.base = 0;
+    this.accessories = 0;
+    this.hair = 0;
+    this.face = 0;
+    this.faceItem = 0;
+    this.shirt = 0;
+    this.skin = 0;
+    this.pants = 0;
+    this.hatColor = 0;
+    this.hat = "none";
+    this.fire = false;
+    this.walking = false;
+    this.circle = false;
+    this.size = 200;
   }
 
-  // Lit reactive properties
   static get properties() {
     return {
-      ...super.properties,
-      title: { type: String },
-      seed: { type: String}
+      seed: { type: String },
+      hat: { type: String },
+      fire: { type: Boolean },
+      walking: { type: Boolean },
+      circle: { type: Boolean },
     };
   }
 
-  // Lit scoped styles
   static get styles() {
-    return [super.styles,
-    css`
-      :host {
-        display: block;
-        color: var(--ddd-theme-primary);
-        background-color: var(--ddd-theme-accent);
-        font-family: var(--ddd-font-navigation);
-      }
-      .wrapper {
-        margin: var(--ddd-spacing-2);
-        padding: var(--ddd-spacing-4);
-      }
-      h3 span {
-        font-size: var(--project2a-rpg-label-font-size, var(--ddd-font-size-s));
-      }
-      /* wired-combo, wired-item {
-        border: 1px solid red;
-        background-color: white;
-      } */
-wired-item {
-  color: black; /* Ensures text is visible */
-  background-color: white; /* Explicit background for dropdown items */
-  padding: 8px;
-  font-family: Arial, sans-serif; /* Default font for readability */
-}
-
-
-
-      
-      
-    `];
+    return [
+      super.styles,
+      css`
+        :host {
+          display: block;
+          color: var(--ddd-theme-primary);
+          background-color: var(--ddd-theme-accent);
+          padding: var(--ddd-spacing-4);
+        }
+        .container {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: var(--ddd-spacing-4);
+        }
+        .character-panel {
+          text-align: center;
+        }
+        .inputs-panel {
+          background-color: var(--ddd-theme-background-secondary);
+          padding: var(--ddd-spacing-4);
+        }
+        .dropdown-row {
+          display: flex;
+          gap: var(--ddd-spacing-4);
+          margin-bottom: var(--ddd-spacing-4);
+        }
+        .dropdown-container {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        wired-combo {
+          flex: 1;
+          width: 100%;
+        }
+        wired-checkbox {
+          display: block;
+          margin-top: var(--ddd-spacing-4);
+        }
+        wired-button {
+          margin-top: var(--ddd-spacing-4);
+        }
+        .seed-display {
+          margin-top: var(--ddd-spacing-2);
+          font-size: var(--ddd-font-size-m);
+        }
+      `,
+    ];
   }
 
-  _updateSeed(index, value) {
-    
-      const seedArray = this.seed.split("");
-      seedArray[index] = value; // Update the specific character
-      this.seed = seedArray.join(""); // Recombine the seed as a string
-      console.log(`Updated seed: ${this.seed}`);
-    
-  }
-
-  // Lit render the HTML
   render() {
     return html`
-<div class="wrapper">
-  <h3><span>${this.t.title}:</span> ${this.title}</h3>
-  <slot></slot>
-
-  <rpg-character seed="${this.seed}"></rpg-character>
-
-  <h2>Accessories</h2>
-  <wired-combo
-          @selected="${(e) => this._updateSeed(0, e.detail.value)}"
-          selected="${this.seed[0]}"
-        >
-        <wired-item value="0">0</wired-item>
-        <wired-item value="1">1</wired-item>
-        <wired-item value="2"> 2</wired-item>
-        <wired-item value="3">3</wired-item>
-        <wired-item value="4">4</wired-item>
-        <wired-item value="5">5</wired-item>
-        <wired-item value="6">6</wired-item>
-        <wired-item value="7">7</wired-item>
-        <wired-item value="8">8</wired-item>
-        <wired-item value="9">9</wired-item>
-    </wired-combo>
-    <h2>Hat</h2>
-  <wired-combo
-          @selected="${(e) => this._updateSeed(0, e.detail.value)}"
-          selected="${this.seed[0]}"
-        >
-        <wired-item value="0">0</wired-item>
-        <wired-item value="1">1</wired-item>
-        <wired-item value="2"> 2</wired-item>
-        <wired-item value="3">3</wired-item>
-        <wired-item value="4">4</wired-item>
-        <wired-item value="5">5</wired-item>
-        <wired-item value="6">6</wired-item>
-        <wired-item value="7">7</wired-item>
-        <wired-item value="8">8</wired-item>
-        <wired-item value="9">9</wired-item>
-    </wired-combo>
-    <h2>Skin Color</h2>
-  <wired-combo
-          @selected="${(e) => this._updateSeed(0, e.detail.value)}"
-          selected="${this.seed[0]}"
-        >
-        <wired-item value="0">0</wired-item>
-        <wired-item value="1">1</wired-item>
-        <wired-item value="2"> 2</wired-item>
-        <wired-item value="3">3</wired-item>
-        <wired-item value="4">4</wired-item>
-        <wired-item value="5">5</wired-item>
-        <wired-item value="6">6</wired-item>
-        <wired-item value="7">7</wired-item>
-        <wired-item value="8">8</wired-item>
-        <wired-item value="9">9</wired-item>
-    </wired-combo>
-    <h2>Pose</h2>
-  <wired-combo
-          @selected="${(e) => this._updateSeed(0, e.detail.value)}"
-          selected="${this.seed[0]}"
-        >
-        <wired-item value="0">0</wired-item>
-        <wired-item value="1">1</wired-item>
-        <wired-item value="2"> 2</wired-item>
-        <wired-item value="3">3</wired-item>
-        <wired-item value="4">4</wired-item>
-        <wired-item value="5">5</wired-item>
-        <wired-item value="6">6</wired-item>
-        <wired-item value="7">7</wired-item>
-        <wired-item value="8">8</wired-item>
-        <wired-item value="9">9</wired-item>
-    </wired-combo>
-
-
-
-</div>`;
+      <div class="container">
+        <div class="character-panel">
+          <rpg-character
+            seed="${this.seed}"
+            hat="${this.hat}"
+            ?fire="${this.fire}"
+            ?walking="${this.walking}"
+            ?circle="${this.circle}"
+          ></rpg-character>
+          <div class="seed-display">Seed: ${this.seed}</div>
+        </div>
+        <div class="inputs-panel">
+          <h2>Customize Your Character</h2>
+          ${this._renderDropdownRow([
+            { label: "Accessories", key: "accessories", range: 10 },
+            { label: "Base", key: "base", range: 10 },
+          ])}
+          ${this._renderDropdownRow([
+            { label: "Face", key: "face", range: 6 },
+            { label: "Face Item", key: "faceItem", range: 10 },
+          ])}
+          ${this._renderDropdownRow([
+            { label: "Hair", key: "hair", range: 10 },
+            { label: "Pants", key: "pants", range: 10 },
+          ])}
+          ${this._renderDropdownRow([
+            { label: "Shirt", key: "shirt", range: 10 },
+            { label: "Skin", key: "skin", range: 10 },
+          ])}
+          ${this._renderDropdownRow([
+            { label: "Hat Color", key: "hatColor", range: 10 },
+            { label: "Hat", key: "hat", values: [
+              "none",
+              "bunny",
+              "coffee",
+              "construction",
+              "cowboy",
+              "education",
+              "knight",
+              "ninja",
+              "party",
+              "pirate",
+              "watermelon",
+            ] },
+          ])}
+          ${this._renderCheckbox("Fire", "fire")}
+          ${this._renderCheckbox("Walking", "walking")}
+          ${this._renderCheckbox("Circle", "circle")}
+          <wired-button class="share" @click="${this._generateShareLink}">Share</wired-button>
+        </div>
+      </div>
+    `;
   }
 
-  /**
-   * haxProperties integration via file reference
-   */
-  static get haxProperties() {
-    return new URL(`./lib/${this.tag}.haxProperties.json`, import.meta.url)
-      .href;
+  _renderDropdownRow(dropdowns) {
+    return html`
+      <div class="dropdown-row">
+        ${dropdowns.map((dropdown) =>
+          html`<div class="dropdown-container">
+            <label>${dropdown.label}</label>
+            ${dropdown.values
+              ? this._renderDropdownWithValues(dropdown.key, dropdown.values)
+              : this._renderDropdown(dropdown.key, dropdown.range)}
+          </div>`
+        )}
+      </div>
+    `;
+  }
+
+  _renderDropdown(key, range) {
+    return html`
+      <wired-combo
+        @selected="${(e) => this._updateSeed(key, e.detail.value)}"
+      >
+        ${Array.from({ length: range }, (_, i) => html`<wired-item value="${i}">${i}</wired-item>`)}
+      </wired-combo>
+    `;
+  }
+
+  _renderDropdownWithValues(key, values) {
+    return html`
+      <wired-combo
+        @selected="${(e) => this._updateSeed(key, e.detail.value)}"
+      >
+        ${values.map((value) => html`<wired-item value="${value}">${value}</wired-item>`)}
+      </wired-combo>
+    `;
+  }
+
+  _renderCheckbox(label, key) {
+    return html`
+      <wired-checkbox
+        ?checked="${this[key]}"
+        @change="${(e) => this._updateCheckbox(key, e.target.checked)}"
+      >
+        ${label}
+      </wired-checkbox>
+    `;
+  }
+
+  _updateSeed(key, value) {
+    const seedArray = this.seed.padEnd(10, "0").split("");
+    const index = this._getSeedIndex(key);
+    if (index >= 0) {
+      seedArray[index] = value;
+      this.seed = seedArray.join("");
+    }
+  }
+
+  _getSeedIndex(key) {
+    const mapping = {
+      accessories: 0,
+      base: 1,
+      face: 2,
+      faceItem: 3,
+      hair: 4,
+      pants: 5,
+      shirt: 6,
+      skin: 7,
+      hatColor: 8,
+    };
+    return mapping[key] ?? -1;
+  }
+
+  _updateCheckbox(key, value) {
+    this[key] = value;
+  }
+
+  _generateShareLink() {
+    const link = `${location.origin}${location.pathname}?seed=${this.seed}&hat=${this.hat}&fire=${this.fire}&walking=${this.walking}&circle=${this.circle}`;
+    navigator.clipboard.writeText(link);
+    alert("Link copied to clipboard!");
   }
 }
+
 globalThis.customElements.define(RpgMe.tag, RpgMe);
+
