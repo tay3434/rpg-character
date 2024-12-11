@@ -1,7 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { DDDSuper } from "@haxtheweb/d-d-d/d-d-d.js";
 import { I18NMixin } from "@haxtheweb/i18n-manager/lib/I18NMixin.js";
-import { WiredButton, WiredCombo, WiredItem, WiredCheckbox } from "wired-elements";
+import { WiredButton, WiredCombo, WiredItem, WiredCheckbox, WiredSlider } from "wired-elements";
 import "@haxtheweb/rpg-character/rpg-character.js";
 // import "wired-elements";
 
@@ -12,7 +12,15 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
 
   constructor() {
     super();
-    this.seed = "0000000000";
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlseed = urlParams.get('seed');
+    console.log(urlseed);
+    if (urlseed){
+      this.seed = urlseed;
+    }
+    else {
+      this.seed = "0000000000";
+    }
     this.base = 0;
     this.accessories = 0;
     this.hair = 0;
@@ -36,6 +44,7 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
       fire: { type: Boolean },
       walking: { type: Boolean },
       circle: { type: Boolean },
+      size: { type: Number},
     };
   }
 
@@ -71,6 +80,9 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
           flex-direction: column;
           align-items: flex-start;
         }
+        wired-item{
+          opacity: 1;
+        }
         wired-combo {
           flex: 1;
           width: 100%;
@@ -81,6 +93,11 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
         }
         wired-button {
           margin-top: var(--ddd-spacing-4);
+        }
+        wired-slider {
+          display: block;
+          margin-bottom: var(--ddd-spacing-4);
+          max-width: 300px;
         }
         .seed-display {
           margin-top: var(--ddd-spacing-2);
@@ -100,6 +117,7 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
             ?fire="${this.fire}"
             ?walking="${this.walking}"
             ?circle="${this.circle}"
+            size="${this.size}"
           ></rpg-character>
           <div class="seed-display">Seed: ${this.seed}</div>
         </div>
@@ -137,6 +155,14 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
               "watermelon",
             ] },
           ])}
+          <label for="size">Character Size:</label>
+          <wired-slider
+            id="size"
+            value="${this.size}"
+            min="100"
+            max="600"
+            @change="${this._updateSize}"
+            ></wired-slider>
           ${this._renderCheckbox("Fire", "fire")}
           ${this._renderCheckbox("Walking", "walking")}
           ${this._renderCheckbox("Circle", "circle")}
@@ -164,7 +190,7 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
   _renderDropdown(key, range) {
     return html`
       <wired-combo
-        @selected="${(e) => this._updateSeed(key, e.detail.value)}"
+        @selected="${(e) => this._updateSeed(key, e.detail.selected)}"
       >
         ${Array.from({ length: range }, (_, i) => html`<wired-item value="${i}">${i}</wired-item>`)}
       </wired-combo>
@@ -224,6 +250,12 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
     const link = `${location.origin}${location.pathname}?seed=${this.seed}&hat=${this.hat}&fire=${this.fire}&walking=${this.walking}&circle=${this.circle}`;
     navigator.clipboard.writeText(link);
     alert("Link copied to clipboard!");
+  }
+
+  _updateSize(e){
+    const newsize = e.detail.value;
+    console.log("Size updated to: ${newsize}");
+    this.size = newsize;
   }
 }
 
