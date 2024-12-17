@@ -4,6 +4,7 @@ import { I18NMixin } from "@haxtheweb/i18n-manager/lib/I18NMixin.js";
 import { WiredButton, WiredCombo, WiredItem, WiredCheckbox, WiredSlider } from "wired-elements";
 import "@haxtheweb/rpg-character/rpg-character.js";
 
+
 export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
   static get tag() {
     return "rpg-me";
@@ -90,14 +91,17 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
           flex-direction: column;
           align-items: flex-start;
         }
-        wired-item{
-          opacity: 1;
-        }
         wired-combo {
           flex: 1;
           width: 100%;
+          height: var(--ddd-spacing-10);
+          margin-bottom: var(--ddd-spacing-6);
+       
+        }
+        wired-item{
           opacity: 1;
         }
+  
         wired-checkbox {
           display: block;
           margin-top: var(--ddd-spacing-4);
@@ -154,7 +158,7 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
           <wired-input type="number" min="0" max="9" value="${this.accessories}" @input="${this.updateProperty('accessories')}"></wired-input>
 
           <label for="base">Base:</label>
-          <wired-input type="number" min="0" max="9" value="${this.base}" @input="${this.updateProperty('base')}"></wired-input>
+          <wired-input type="number" min="0" max="1" value="${this.base}" @input="${this.updateProperty('base')}"></wired-input>
 
           <label for="face">Face:</label>
           <wired-input type="number" min="0" max="9" value="${this.face}" @input="${this.updateProperty('face')}"></wired-input>
@@ -178,33 +182,30 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
           <wired-input type="number" min="0" max="9" value="${this.hatColor}" @input="${this.updateProperty('hatColor')}"></wired-input>
 
           <label for="hat">Hat:</label>
-          <!-- <select value="${this.hat}" @change="${this.updateProperty('hat')}">
-            <option value="none" ?selected="${this.hat === 'none'}">None</option>
-            <option value="bunny" ?selected="${this.hat === 'bunny'}">Bunny</option>
-            <option value="coffee" ?selected="${this.hat === 'coffee'}">Coffee</option>
-            <option value="construction" ?selected="${this.hat === 'construction'}">Construction</option>
-            <option value="cowboy" ?selected="${this.hat === 'cowboy'}">Cowboy</option>
-            <option value="education" ?selected="${this.hat === 'education'}">Education</option>
-            <option value="knight" ?selected="${this.hat === 'knight'}">Knight</option>
-            <option value="ninja" ?selected="${this.hat === 'ninja'}">Ninja</option>
-            <option value="party" ?selected="${this.hat === 'party'}">Party</option>
-            <option value="pirate" ?selected="${this.hat === 'pirate'}">Pirate</option>
-            <option value="watermelon" ?selected="${this.hat === 'watermelon'}">Watermelon</option>
-        </select> -->
-        <wired-combo value="${this.hat}" @selected="${this.updateProperty('hat')}">
-            <wired-item value="none" ?selected="${this.hat === 'none'}">None</wired-item>
-            <wired-item value="bunny" ?selected="${this.hat === 'bunny'}">Bunny</wired-item>
-            <wired-item value="coffee" ?selected="${this.hat === 'coffee'}">Coffee</wired-item>
-            <wired-item value="construction" ?selected="${this.hat === 'construction'}">Construction</wired-item>
-            <wired-item value="cowboy" ?selected="${this.hat === 'cowboy'}">Cowboy</wired-item>
-            <wired-item value="education" ?selected="${this.hat === 'education'}">Education</wired-item>
-            <wired-item value="knight" ?selected="${this.hat === 'knight'}">Knight</wired-item>
-            <wired-item value="ninja" ?selected="${this.hat === 'ninja'}">Ninja</wired-item>
-            <wired-item value="party" ?selected="${this.hat === 'party'}">Party</wired-item>
-            <wired-item value="pirate" ?selected="${this.hat === 'pirate'}">Pirate</wired-item>
-            <wired-item value="watermelon" ?selected="${this.hat === 'watermelon'}">Watermelon</wired-item>
-  </wired-combo>
+          <wired-combo id="hat" .selected="${this.hat}"
+                @selected="${(e) => this._updateCheckbox('hat', e.detail.selected)}">
+                  <wired-item value="none">None</wired-item>
+                  <wired-item value="bunny">Bunny</wired-item>
+                  <wired-item value="coffee">Coffee</wired-item>
+                  <wired-item value="construction">Construction</wired-item>
+                  <wired-item value="cowboy">Cowboy</wired-item>
+                  <wired-item value="education">Education</wired-item>
+                  <wired-item value="knight">Knight</wired-item>
+                  <wired-item value="ninja">Ninja</wired-item>
+                  <wired-item value="party">Party</wired-item>
+                  <wired-item value="pirate">Pirate</wired-item>
+                  <wired-item value="watermelon">Watermelon</wired-item>
+                </wired-combo>
+
+ 
           <label for="size">Character Size:</label>
+          <wired-slider 
+          id="size"
+          value="200" 
+          min="100" max="600" 
+          step="100"
+          @change="${(e) => this._updateCheckbox('size', parseFloat(e.detail.value))}">
+                </wired-slider>
           <wired-slider
             id="size"
             value="${this.size}"
@@ -231,6 +232,11 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
       </wired-checkbox>
     `;
   }
+
+  _updateSize(e) {
+    const newSize = e.detail.value;
+    this.size = newSize;
+    }
 
   _updateSeed(key, value) {
     const seedArray = this.seed.padEnd(10, "0").split("");
@@ -267,28 +273,14 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
   }
   updateProperty(property) {
     return (e) => {
-      // const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
       const value = e.target.selected ? e.target.selected.value : e.target.value;
-
       this[property] = value;
       this.updateSeed();
     };
   }
-
-  _updateSize(e) {
-    const newsize = e.detail; // add .value
-    // console.log(`Size updated to: ${newsize}`);
-    // this.size = newsize;
-
-    // // Ensure that the character size is reflected in the custom property
-    // const character = this.shadowRoot.querySelector("rpg-character");
-    // if (character) {
-    //   character.style.setProperty("--character-size", `${newsize}px`);
-    }
-  }
+}
 
 globalThis.customElements.define(RpgMe.tag, RpgMe);
 
 
-   
 
