@@ -191,7 +191,7 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
             <option value="pirate" ?selected="${this.hat === 'pirate'}">Pirate</option>
             <option value="watermelon" ?selected="${this.hat === 'watermelon'}">Watermelon</option>
         </select> -->
-        <wired-combo value="${this.hat}" @change="${this.updateProperty('hat')}">
+        <wired-combo value="${this.hat}" @selected="${this.updateProperty('hat')}">
             <wired-item value="none" ?selected="${this.hat === 'none'}">None</wired-item>
             <wired-item value="bunny" ?selected="${this.hat === 'bunny'}">Bunny</wired-item>
             <wired-item value="coffee" ?selected="${this.hat === 'coffee'}">Coffee</wired-item>
@@ -220,41 +220,6 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
       </div>
     `;
   }
-
-  // _renderDropdownRow(dropdowns) {
-  //   return html`
-  //     <div class="dropdown-row">
-  //       ${dropdowns.map((dropdown) =>
-  //         html`<div class="dropdown-container">
-  //           <label>${dropdown.label}</label>
-  //           ${dropdown.values
-  //             ? this._renderDropdownWithValues(dropdown.key, dropdown.values)
-  //             : this._renderDropdown(dropdown.key, dropdown.range)}
-  //         </div>`
-  //       )}
-  //     </div>
-  //   `;
-  // }
-
-  // _renderDropdown(key, range) {
-  //   return html`
-  //     <wired-combo
-  //       @selected="${(e) => this._updateSeed(key, e.detail.selected)}"
-  //     >
-  //       ${Array.from({ length: range }, (_, i) => html`<wired-item value="${i}">${i}</wired-item>`)}
-  //     </wired-combo>
-  //   `;
-  // }
-
-  // _renderDropdownWithValues(key, values) {
-  //   return html`
-  //     <wired-combo
-  //       @selected="${(e) => this._updateSeed(key, e.detail.value)}"
-  //     >
-  //       ${values.map((value) => html`<wired-item value="${value}">${value}</wired-item>`)}
-  //     </wired-combo>
-  //   `;
-  // }
 
   _renderCheckbox(label, key) {
     return html`
@@ -302,7 +267,9 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
   }
   updateProperty(property) {
     return (e) => {
-      const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+      // const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+      const value = e.target.selected ? e.target.selected.value : e.target.value;
+
       this[property] = value;
       this.updateSeed();
     };
