@@ -34,7 +34,8 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
     this.fire = false;
     this.walking = false;
     this.circle = false;
-    this.size = 200;
+    this.scale = 2.5;
+    this.leg = 0;
   }
 
   static get properties() {
@@ -53,9 +54,10 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
       pants: { type: Number },
       shirt: { type: Number },
       skin: { type: Number },
-      size: { type: Number },
+      scale: { type: Number },
       hatColor: { type: Number },
       hat: { type: String },
+      leg: { type: Number },
     };
   }
 
@@ -68,18 +70,12 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
           color: var(--ddd-theme-primary);
           background-color: var(--ddd-theme-accent);
           padding: var(--ddd-spacing-4);
+          --rpg-character-scale: 2.5;
         }
         .container {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: var(--ddd-spacing-4);
-        }
-        .character-panel {
-          text-align: center;
-        }
-        .inputs-panel {
-          background-color: var(--ddd-theme-background-secondary);
-          padding: var(--ddd-spacing-4);
         }
         .dropdown-row {
           display: flex;
@@ -91,6 +87,11 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
           flex-direction: column;
           align-items: flex-start;
         }
+        rpg-character {
+          transform: scale(var(--rpg-character-scale, 2.5));
+          margin: var(--ddd-spacing-28);
+        }
+        
         wired-combo {
           flex: 1;
           width: 100%;
@@ -124,6 +125,23 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
           margin-top: var(--ddd-spacing-2);
           font-size: var(--ddd-font-size-m);
         }
+        .character-panel {
+          text-align: center;
+          background-color: var(--ddd-theme-default-skyBlue);
+          border: 2px solid var(--ddd-theme-default-link80);
+          padding: var(--ddd-spacing-6);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .inputs-panel {
+          background-color: var(--ddd-theme-default-athertonViolet);
+          border: 2px solid var(--ddd-theme-default-wonderPurple);
+          padding: var(--ddd-spacing-6);
+          border-radius: 8px;
+        }
+        .leg-disabled {
+          opacity: 0.4;
+          pointer-events: none;
+        }
       `,
     ];
   }
@@ -133,6 +151,7 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
       <div class="container">
         <div class="character-panel">
           <rpg-character
+           style="--rpg-character-scale: ${this.scale}"
             seed="${this.seed}"
             accessories="${this.accessories}"
             base="${this.base}"
@@ -145,12 +164,13 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
             size="${this.size}"
             hatColor="${this.hatColor}"
             hat="${this.hat}"
-            ?fire="${this.fire}"
             ?walking="${this.walking}"
             ?circle="${this.circle}"
-            style="--character-size: ${this.size}px;" 
           ></rpg-character>
-          <div class="seed-display">Seed: ${this.seed}</div>
+          <div class="seed-display">Seed: ${this.seed}
+            <div><a href="https://github.com/haxtheweb/issues/issues/1414" target="blank">Issue</a></div>
+          </div>
+          
         </div>
         <div class="inputs-panel">
           <h2>Customize Your Character</h2>
@@ -158,7 +178,10 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
           <wired-input type="number" min="0" max="9" value="${this.accessories}" @input="${this.updateProperty('accessories')}"></wired-input>
 
           <label for="base">Base:</label>
-          <wired-input type="number" min="0" max="1" value="${this.base}" @input="${this.updateProperty('base')}"></wired-input>
+          <wired-input type="number" min="0" max="9" value="${this.base}" @input="${this.updateProperty('base')}"></wired-input>
+
+          <label for="leg">Leg:</label>
+          <wired-input type="number" min="0" max="1" value="${this.leg}" @input="${this.updateProperty('leg')}" class="${this.leg === 0 ? 'leg-disabled' : ''}" ?disabled="${this.leg === 0}"></wired-input>
 
           <label for="face">Face:</label>
           <wired-input type="number" min="0" max="9" value="${this.face}" @input="${this.updateProperty('face')}"></wired-input>
@@ -198,21 +221,16 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
                 </wired-combo>
 
  
-          <label for="size">Character Size:</label>
+          <label for="scale">Character Size:</label>
           <wired-slider 
-          id="size"
-          value="200" 
-          min="100" max="600" 
-          step="100"
-          @change="${(e) => this._updateCheckbox('size', parseFloat(e.detail.value))}">
-                </wired-slider>
-          <wired-slider
-            id="size"
-            value="${this.size}"
-            min="100"
-            max="600"
-            @change="${this._updateSize}"
-            ></wired-slider>
+            id="scale" 
+            value="2.5" 
+            min="1" 
+            max="3" 
+            step=".5"
+            @change="${(e) => this._updateCheckbox('scale', parseFloat(e.detail.value))}">
+          </wired-slider>
+        
           ${this._renderCheckbox("Fire", "fire")}
           ${this._renderCheckbox("Walking", "walking")}
           ${this._renderCheckbox("Circle", "circle")}
@@ -232,11 +250,6 @@ export class RpgMe extends DDDSuper(I18NMixin(LitElement)) {
       </wired-checkbox>
     `;
   }
-
-  _updateSize(e) {
-    const newSize = e.detail.value;
-    this.size = newSize;
-    }
 
   _updateSeed(key, value) {
     const seedArray = this.seed.padEnd(10, "0").split("");
